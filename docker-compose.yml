@@ -1,0 +1,16 @@
+version: '3.3'
+
+name: tasks-database-dev
+
+services:
+  postgres:
+    container_name: tasks-database-dev
+    image: postgres
+    environment:
+      - POSTGRES_DB=tasks_db
+      - POSTGRES_USER=kazte
+      - POSTGRES_PASSWORD=V93xiyJYzP5HUYYF5
+    ports:
+      - '5433:5432'
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
