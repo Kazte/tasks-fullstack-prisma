@@ -41,7 +41,7 @@ export default function TaskCard({ task }: Props) {
       }`}
     >
       <div className='card-body'>
-        <h2 className='card-title text-3xl '>{currentTask.title}</h2>
+        <h2 className='card-title text-2xl truncate'>{currentTask.title}</h2>
         <p className='text-lg'>{currentTask.body}</p>
         <small className='text-sm font-semibold'>
           {new Date(currentTask.create_at).toLocaleDateString()}
