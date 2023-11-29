@@ -2,22 +2,19 @@
 
 import { Task } from '@prisma/client';
 import { getSession } from 'next-auth/react';
-import { useState } from 'react';
-import { MdAdd } from 'react-icons/md';
+import { useEffect, useState } from 'react';
+import { MdAdd, MdClose, MdSave } from 'react-icons/md';
 import { authOptions } from '~/app/api/auth/[...nextauth]/route';
 
 interface Props {
   task: Task;
+  onClose: (task: Task) => void;
 }
 
-export default function EditTaskModal({ task }: Props) {
+export default function EditTaskModal({ task, onClose }: Props) {
   const [textAreaCharacters, setTextAreaCharacters] = useState(0);
 
-  const [modalState, setModalState] = useState({
-    title: task.title,
-    body: task.body,
-    important: task.important
-  });
+  const [modalState, setModalState] = useState<any>(task);
 
   const handleTextAreaOnChange = (
     e: React.ChangeEvent<HTMLTextAreaElement>
@@ -47,23 +44,31 @@ export default function EditTaskModal({ task }: Props) {
 
       const response = await fetch('/api/task', {
         method: 'PATCH',
-        body: JSON.stringify({ ...modalState })
+        body: JSON.stringify({ ...modalState, id: task.id })
       });
 
       const responseData = await response.json();
 
-      document.getElementById('new_task_modal')?.close();
+      onClose(responseData);
     } catch (error) {
       console.error(error.message);
     }
   };
 
+  useEffect(() => {
+    setModalState({
+      body: task?.body,
+      important: task?.important,
+      title: task?.title
+    });
+  }, [task]);
+
   return (
-    <dialog id='new_task_modal' className='modal'>
+    <dialog id={`edit_task_${task.id}_modal`} className='modal'>
       <div className='modal-box flex flex-col'>
         <h3 className='font-bold text-4xl text-center'>Update Task!</h3>
 
-        <div className='modal-action'>
+        <div className='modal-action flex-col'>
           <form
             onSubmit={handleSubmit}
             style={{
@@ -79,7 +84,7 @@ export default function EditTaskModal({ task }: Props) {
                 placeholder='e.g. Watch a video.'
                 className='input input-bordered w-full'
                 onChange={handleTitleOnChange}
-                value={modalState.title}
+                value={modalState?.title}
               />
             </div>
 
@@ -88,16 +93,16 @@ export default function EditTaskModal({ task }: Props) {
                 <span className='label-text'>Body</span>
               </label>
               <textarea
-                className='textarea textarea-bordered resize-none'
+                className='textarea textarea-bordered resize-none h-[110px]'
                 placeholder='Bio'
-                maxLength={255}
-                rows={5}
+                maxLength={125}
+                rows={3}
                 onChange={handleTextAreaOnChange}
-                value={modalState.body}
+                value={modalState?.body}
               ></textarea>
               <label className='label'>
                 <span className='label-text-alt'></span>
-                <span className='label-text-alt'>{textAreaCharacters}/255</span>
+                <span className='label-text-alt'>{textAreaCharacters}/125</span>
               </label>
             </div>
 
@@ -107,7 +112,7 @@ export default function EditTaskModal({ task }: Props) {
                 <input
                   type='checkbox'
                   className='toggle'
-                  checked={modalState.important}
+                  checked={modalState?.important}
                   onChange={handleImportantOnChange}
                 />
               </label>
@@ -115,19 +120,19 @@ export default function EditTaskModal({ task }: Props) {
 
             <div className='flex flex-row justify-end items-center gap-3 mt-3 w-full'>
               <button className='btn btn-success'>
-                <MdAdd size='24px' />
-                Create Task
-              </button>
-              <button
-                className='btn btn-error'
-                onClick={() => {
-                  document.getElementById('new_task_modal')?.close();
-                }}
-              >
-                Close
+                <MdSave size='24px' />
+                Save Task
               </button>
             </div>
           </form>
+          <button
+            onClick={() => {
+              onClose(task);
+            }}
+            className='btn btn-sm btn-circle btn-ghost absolute right-2 top-2'
+          >
+            <MdClose size='24px' />
+          </button>
         </div>
       </div>
     </dialog>

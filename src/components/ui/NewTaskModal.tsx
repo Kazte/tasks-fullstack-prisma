@@ -2,7 +2,7 @@
 
 import { getSession } from 'next-auth/react';
 import { useState } from 'react';
-import { MdAdd } from 'react-icons/md';
+import { MdAdd, MdClose } from 'react-icons/md';
 import { authOptions } from '~/app/api/auth/[...nextauth]/route';
 
 export default function NewTaskModal() {
@@ -83,16 +83,16 @@ export default function NewTaskModal() {
                 <span className='label-text'>Body</span>
               </label>
               <textarea
-                className='textarea textarea-bordered resize-none'
+                className='textarea textarea-bordered resize-none h-[110px]'
                 placeholder='Bio'
-                maxLength={255}
-                rows={5}
+                maxLength={125}
+                rows={3}
                 onChange={handleTextAreaOnChange}
                 value={modalState.body}
               ></textarea>
               <label className='label'>
                 <span className='label-text-alt'></span>
-                <span className='label-text-alt'>{textAreaCharacters}/255</span>
+                <span className='label-text-alt'>{textAreaCharacters}/125</span>
               </label>
             </div>
 
@@ -113,16 +113,16 @@ export default function NewTaskModal() {
                 <MdAdd size='24px' />
                 Create Task
               </button>
-              <button
-                className='btn btn-error'
-                onClick={() => {
-                  document.getElementById('new_task_modal')?.close();
-                }}
-              >
-                Close
-              </button>
             </div>
           </form>
+          <button
+            onClick={() => {
+              document.getElementById('new_task_modal')?.close();
+            }}
+            className='btn btn-sm btn-circle btn-ghost absolute right-2 top-2'
+          >
+            <MdClose size='24px' />
+          </button>
         </div>
       </div>
     </dialog>

@@ -2,7 +2,7 @@ import { Task } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '~/libs/prisma';
 
-export async function GET(request: NextRequest, context: any) {
+export async function GET(request: NextRequest) {
   const username = request.nextUrl.searchParams.get('username')?.toString();
 
   const user = await prisma.user.findUnique({
@@ -47,17 +47,33 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   const data: Task = await request.json();
+  console.log(data);
 
   try {
     const newTask = await prisma.task.update({
-      data,
       where: {
         id: data.id
+      },
+      data: {
+        ...data
       }
     });
 
     return NextResponse.json({ ...newTask }, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ message: error.message }, { status: 401 });
+    return NextResponse.json({ message: error.message }, { status: 400 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const id: number = parseInt(
+    request.nextUrl.searchParams.get('id').toString()
+  );
+
+  try {
+    await prisma.task.delete({ where: { id } });
+    return NextResponse.json({ message: 'ok' });
+  } catch (error) {
+    return NextResponse.json({ message: error.message }, { status: 400 });
   }
 }
