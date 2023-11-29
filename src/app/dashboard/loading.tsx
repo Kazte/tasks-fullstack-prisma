@@ -1,3 +1,5 @@
+import Loading from '~/components/Loading';
+
 export default function LoadingDashboard() {
-  return <div>loading...</div>;
+  return <Loading loaded={false} />;
 }

@@ -16,6 +16,12 @@ export async function GET(request: NextRequest) {
 
   const tasksFounded = user.Task;
 
+  await new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(null);
+    }, 1000);
+  });
+
   return NextResponse.json({ data: tasksFounded });
 }
 
@@ -47,7 +53,6 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   const data: Task = await request.json();
-  console.log(data);
 
   try {
     const newTask = await prisma.task.update({

@@ -4,16 +4,16 @@ import { Task } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { MdDelete, MdEdit } from 'react-icons/md';
 import EditTaskModal from './ui/EditTaskModal';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   task: Task;
-  onDelete: (task: Task) => void;
 }
 
-export default function TaskCard({ task, onDelete }: Props) {
+export default function TaskCard({ task }: Props) {
   const [currentTask, setCurrentTask] = useState<Task>(task);
   const [important, setImportant] = useState<boolean>(task.important);
-  const [editing, setEditing] = useState(false);
+  const router = useRouter();
 
   const handleComplete = async () => {
     try {
@@ -35,23 +35,43 @@ export default function TaskCard({ task, onDelete }: Props) {
     }
   };
 
-  useEffect(() => {
-    console.log('change');
-  }, [important]);
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`/api/task?id=${task.id}`, {
+        method: 'DELETE',
+        body: JSON.stringify({
+          ...currentTask,
+          completed: !currentTask.completed
+        })
+      });
+
+      const responseData = await response.json();
+      console.log(responseData);
+
+      if (response.ok) {
+        router.refresh();
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   return (
     <>
       <li
-        className={`card h-[252px] w-[344px] shadow-xl ${
-          important === true
-            ? 'bg-accent text-accent-content'
-            : 'bg-neutral text-neutral-content'
+        className={`card h-[252px] w-[344px] shadow-xl bg-neutral text-neutral-content border-2 border-transparent ${
+          important === true ? 'border-accent' : ''
         }`}
       >
         <div className='card-body'>
-          <h2 className='card-title text-2xl line-clamp-1'>
-            {currentTask.title}
-          </h2>
+          <div
+            className='tooltip tooltip-primary tooltip-bottom'
+            data-tip={currentTask.title}
+          >
+            <h2 className='card-title text-left text-2xl line-clamp-1'>
+              {currentTask.title}
+            </h2>
+          </div>
           <p className='text-sm h-[80px]'>{currentTask.body}</p>
           <small className='text-sm font-semibold'>
             {new Date(currentTask.create_at).toLocaleDateString()}
@@ -80,12 +100,7 @@ export default function TaskCard({ task, onDelete }: Props) {
               >
                 <MdEdit />
               </button>
-              <button
-                onClick={() => {
-                  onDelete(currentTask);
-                }}
-                className='btn btn-sm'
-              >
+              <button onClick={handleDelete} className='btn btn-sm'>
                 <MdDelete />
               </button>
             </div>

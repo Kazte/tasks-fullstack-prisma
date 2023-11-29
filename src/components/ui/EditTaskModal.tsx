@@ -64,7 +64,7 @@ export default function EditTaskModal({ task, onClose }: Props) {
   }, [task]);
 
   return (
-    <dialog id={`edit_task_${task.id}_modal`} className='modal'>
+    <dialog id={`edit_task_${task.id}_modal`} className='modal shadow-md'>
       <div className='modal-box flex flex-col'>
         <h3 className='font-bold text-4xl text-center'>Update Task!</h3>
 
